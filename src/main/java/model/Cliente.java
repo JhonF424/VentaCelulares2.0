@@ -6,21 +6,23 @@ public class Cliente {
 
     String identificacion, nombre, telefono;
 
-    Cliente() {
+    public Cliente() {
 
     }
 
-    Cliente(String identificacion, String nombre, String telefono) {
+    public Cliente(String identificacion, String nombre, String telefono) {
         this.identificacion = identificacion;
         this.nombre = nombre;
         this.telefono = telefono;
     }
 
-    Cliente(JSONObject data) {
-        this(data.getString("identificacion"), data.getString("nombre"), data.getString("telefono"));
+    public Cliente(JSONObject data) {
+        this. identificacion = data.getString("identificacion");
+        this.nombre = data.getString("nombre");
+        this.telefono = data.getString("telefono");
     }
 
-    Cliente(String strData) {
+    public Cliente(String strData) {
         this(new JSONObject(strData));
     }
 

@@ -9,7 +9,7 @@ public class Venta {
     private Calendar fecha;
     private Cliente cliente;
 
-    Venta() {
+    public Venta() {
 
     }
 
@@ -21,7 +21,8 @@ public class Venta {
 
     public Venta(JSONObject data) {
         this.consecutivo = data.getInt("consecutivo");
-        //this.fecha = 
+        //this.fecha = ????
+        this.cliente = new Cliente(new JSONObject("cliente"));
     }
 
     public Venta(String strData) {
@@ -61,5 +62,6 @@ public class Venta {
     public String toString() {
         return "Venta{ " + "consecutivo: " + consecutivo + ", fecha: " + fecha + ", cliente: " + cliente +" }";
     }
+    
 
 }
