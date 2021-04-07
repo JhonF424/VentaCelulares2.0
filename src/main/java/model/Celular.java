@@ -9,18 +9,18 @@ public class Celular {
 
     public Celular() {}
 
-    public Celular(int cantidad, Tipo tipo) {
+    public Celular(Tipo tipo, int cantidad) {
         this.cantidad = cantidad;
         this.tipo = tipo;
     }
     
     public Celular(Celular cel){
-        this(cel.cantidad, cel.tipo);
+        this(cel.tipo, cel.cantidad);
     }
     
     public Celular(JSONObject data){
-        this.cantidad = data.getInt("cantidad");
         this.tipo = data.getEnum(Tipo.class, "tipo");
+        this.cantidad = data.getInt("cantidad");
     }
     
     public Celular(String strData){
@@ -45,7 +45,15 @@ public class Celular {
     
     @Override
     public boolean equals(Object o) {
-        return false;
+        if (o == this) { 
+            return true;
+        }
+        
+        if (!(o instanceof Celular)) { 
+            return false;
+        }
+        Celular celular = (Celular) o; 
+        return this.tipo.equals(celular.tipo);
     }
 
     @Override

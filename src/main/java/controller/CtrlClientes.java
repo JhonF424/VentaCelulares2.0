@@ -7,7 +7,11 @@ import model.*;
 public class CtrlClientes implements Controller<Cliente> {
 
     private List<Cliente> lstClientes;
-
+    
+    public CtrlClientes(){
+        lstClientes = new ArrayList<>();
+    }
+    
     @Override
     public List list() {
         return lstClientes;

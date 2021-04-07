@@ -57,8 +57,16 @@ public class Cliente {
     }
     
     @Override
-    public boolean equals(Object o){
-        return false;
+    public boolean equals(Object o) {
+        if (o == this) { 
+            return true;
+        }
+        
+        if (!(o instanceof Cliente)) { 
+            return false;
+        }
+        Cliente cliente = (Cliente) o; 
+        return this.identificacion.equals(cliente.identificacion);
     }
 
     @Override

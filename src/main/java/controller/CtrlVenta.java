@@ -1,5 +1,7 @@
 package controller;
 
+import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import model.*;
 import org.json.JSONObject;
@@ -7,6 +9,10 @@ import org.json.JSONObject;
 public class CtrlVenta implements Controller<Venta> {
 
     private List<Venta> lstVentas;
+
+    public CtrlVenta() {
+        lstVentas = new ArrayList<>();
+    }
 
     @Override
     public List<Venta> list() {
@@ -63,7 +69,12 @@ public class CtrlVenta implements Controller<Venta> {
 
     @Override
     public Venta set(int indice, JSONObject data) {
-        return lstVentas.set(indice, new Venta(data));
+        try {
+            return lstVentas.set(indice, new Venta(data));
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override

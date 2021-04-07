@@ -1,7 +1,9 @@
 package model;
 
+import java.text.ParseException;
 import java.util.Calendar;
 import org.json.JSONObject;
+import resources.Helpers;
 
 public class Venta {
 
@@ -19,13 +21,20 @@ public class Venta {
         this.cliente = cliente;
     }
 
-    public Venta(JSONObject data) {
+    public Venta(JSONObject data) throws ParseException{
         this.consecutivo = data.getInt("consecutivo");
-        //this.fecha = ????
+        this.fecha = Helpers.getFecha(data.getString("fecha"));
         this.cliente = new Cliente(new JSONObject("cliente"));
     }
+    
+   /* public JSONObject getJSONObject() {
+        return new JSONObject()
+            .put("consecutivo", consecutivo)
+            .put("cliente", cliente.getJSONObject())
+            .put("fecha", Helpers.strFecha(fecha));
+    } */
 
-    public Venta(String strData) {
+    public Venta(String strData) throws ParseException{
         this(new JSONObject(strData));
     }
 
@@ -55,7 +64,15 @@ public class Venta {
 
     @Override
     public boolean equals(Object o) {
-        return false;
+        if (o == this) { 
+            return true;
+        }
+        
+        if (!(o instanceof Venta)) { 
+            return false;
+        }
+        Venta venta = (Venta) o;
+        return this.consecutivo == venta.consecutivo;
     }
 
     @Override
@@ -63,5 +80,4 @@ public class Venta {
         return "Venta{ " + "consecutivo: " + consecutivo + ", fecha: " + fecha + ", cliente: " + cliente +" }";
     }
     
-
 }
