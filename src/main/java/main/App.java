@@ -6,6 +6,7 @@ import controller.*;
 import java.text.ParseException;
 import model.*;
 import resources.Helpers;
+
 public class App {
 
     static Scanner scan = new Scanner(System.in);
@@ -14,11 +15,11 @@ public class App {
     static CtrlCelulares ctrlCelulares;
     static CtrlVenta ctrlVentas;
     static CtrlDetalleVenta ctrlDetallesVenta;
-    
+    static int consecutivo = 0;
 
-    public static void main(String[] args) throws ParseException{
+    public static void main(String[] args) throws ParseException {
         scan.useDelimiter("[\n]+|[\r\n]+");
-        
+
         /*
         --------------------------------------------------------------
         TESTING
@@ -58,16 +59,9 @@ public class App {
         System.out.println(ctrlDetallesVenta.getPrecioCelular(Tipo.C, 1, 1));     // 1200000
         System.out.println(ctrlDetallesVenta.getPrecioCelular(Tipo.C, 2, 1));     // 1000000
         --------------------------------------------------------------
-        */
-        
-        
+         */
         iniciarControladores();
-        ctrlCelulares.add(new JSONObject(new Celular(Tipo.A, 111)));
-        ctrlClientes.add(new JSONObject(new Cliente("C01", "Carlos Cuesta", "3138447845")));
-        data.put("consecutivo", 1);
-        data.put("fecha", Calendar.getInstance());
-        data.put("cliente", ctrlClientes.get(0));
-        ctrlVentas.add(data);
+        agregarDatosDePrueba();
         /*do {
             int opt = leerOpcion();
             switch (opt) {
@@ -86,8 +80,92 @@ public class App {
         } while (true);*/
 
     }
-    
-    public static void iniciarControladores(){
+
+    public static void agregarCelulares() {
+        ctrlCelulares.add(new JSONObject(new Celular(Tipo.A, 111)));
+        ctrlCelulares.add(new JSONObject(new Celular(Tipo.B, 111)));
+        ctrlCelulares.add(new JSONObject(new Celular(Tipo.C, 111)));
+    }
+
+    public static void agregarClientes() {
+        ctrlClientes.add(new JSONObject(new Cliente("C01", "Carlos Cuesta", "3138447845")));
+        ctrlClientes.add(new JSONObject(new Cliente("C02", "Ricardo Cuesta", "3138447845")));
+        ctrlClientes.add(new JSONObject(new Cliente("C03", "Ricardo Pérez", "3137771234")));
+        ctrlClientes.add(new JSONObject(new Cliente("C04", "Alberto Gomez", "3138447845")));
+    }
+
+    public static void agregarVentas() {
+        if (ctrlVentas.add(new Venta(consecutivo, Calendar.getInstance(), ctrlClientes.get(0)).getJSONObject())) {
+            consecutivo++;
+            agregarDetalleVenta(0, 0, 2);
+            agregarDetalleVenta(0, 1, 4);
+            agregarDetalleVenta(0, 0, 1);
+            agregarDetalleVenta(0, 1, 1);
+            agregarDetalleVenta(0, 2, 1);
+
+        }
+        
+        if (ctrlVentas.add(new Venta(consecutivo, Calendar.getInstance(), ctrlClientes.get(1)).getJSONObject())) {
+            consecutivo++;
+            agregarDetalleVenta(1, 0, 2);
+            agregarDetalleVenta(1, 1, 4);
+            agregarDetalleVenta(1, 0, 2);
+            agregarDetalleVenta(1, 1, 3);
+            agregarDetalleVenta(1, 2, 1);
+        }
+
+        if (ctrlVentas.add(new Venta(consecutivo, Calendar.getInstance(), ctrlClientes.get(2)).getJSONObject())) {
+            consecutivo++;
+            agregarDetalleVenta(2, 2, 2);
+            agregarDetalleVenta(2, 0, 2);
+            agregarDetalleVenta(2, 2, 2);
+            agregarDetalleVenta(2, 1, 4);
+            agregarDetalleVenta(2, 0, 2);
+            agregarDetalleVenta(2, 1, 3);
+        }
+
+        if (ctrlVentas.add(new Venta(consecutivo, Calendar.getInstance(), ctrlClientes.get(3)).getJSONObject())) {
+            consecutivo++;
+            agregarDetalleVenta(3, 2, 1);
+            agregarDetalleVenta(3, 1, 1);
+            agregarDetalleVenta(3, 0, 1);
+        }
+    }
+
+    public static void agregarDetalleVenta(int indiceVenta, int indiceCelular, int cantidad) {
+        Celular celular = ctrlCelulares.get(indiceCelular);
+        boolean flag = ctrlDetallesVenta.add(
+                new JSONObject()
+                        .put("venta", ctrlVentas.get(indiceVenta).getJSONObject())
+                        .put("celular", celular.getJSONObject())
+                        .put("cantidad", cantidad)
+        );
+
+        if (flag) {
+            celular.setCantidad(celular.getCantidad() - cantidad);
+        }
+    }
+
+    public static void agregarDatosDePrueba() {
+        agregarClientes();
+        agregarCelulares();
+        agregarVentas();
+
+        for (DetalleVenta detalle : ctrlDetallesVenta.list()) {
+            System.out.println(detalle.getJSONObject());
+        }
+
+        try {
+            int i = ctrlDetallesVenta.indexOf(
+                       "{ \"venta\": { \"consecutivo\": 1 }, \"celular\": { \"tipo\": \"A\" } }"
+                    );
+            System.out.println(i == -1 ? "No encontrado" : "Encontrado");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void iniciarControladores() {
         ctrlClientes = new CtrlClientes();
         ctrlCelulares = new CtrlCelulares();
         ctrlVentas = new CtrlVenta();

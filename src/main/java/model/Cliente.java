@@ -21,6 +21,13 @@ public class Cliente {
         this.nombre = data.getString("nombre");
         this.telefono = data.getString("telefono");
     }
+    
+       public JSONObject getJSONObject() {
+        return new JSONObject()
+            .put("identificacion", identificacion)
+            .put("nombre", nombre)
+            .put("telefono", telefono);
+    } 
 
     public Cliente(String strData) {
         this(new JSONObject(strData));
@@ -48,12 +55,6 @@ public class Cliente {
 
     public void setTelefono(String telefono) {
         this.telefono = telefono;
-    }
-
-    public JSONObject getJSONObject() {
-        return new JSONObject().put("identificacion", identificacion)
-                .put("nombre", nombre)
-                .put("telefono", telefono);
     }
     
     @Override

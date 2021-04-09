@@ -6,14 +6,14 @@ import model.DetalleVenta;
 import model.Tipo;
 import org.json.JSONObject;
 
-public class CtrlDetalleVenta implements Controller<DetalleVenta>{
-    
+public class CtrlDetalleVenta implements Controller<DetalleVenta> {
+
     private List<DetalleVenta> lstDetallesVenta;
-    
-    public CtrlDetalleVenta(){
+
+    public CtrlDetalleVenta() {
         lstDetallesVenta = new ArrayList<>();
     }
-    
+
     @Override
     public List<DetalleVenta> list() {
         return lstDetallesVenta;
@@ -23,13 +23,18 @@ public class CtrlDetalleVenta implements Controller<DetalleVenta>{
     public boolean add(JSONObject data) {
         boolean flag = false;
         try {
-            if(indexOf(data) > -1){
-                System.out.println("Esta factura ya fue emitida, se sugiere revisar "
-                        + "el consecutivo en la base de datos.");
-                flag = true;
-            } else {
-                lstDetallesVenta.add(new DetalleVenta(data));
-                flag = false;
+            if (data.getInt("cantidad") > 0) {
+                int cantidad = data.getInt("cantidad");
+                int indexDetalle = indexOf(data);
+                if (indexDetalle > -1) {
+                    DetalleVenta detalle = lstDetallesVenta.get(indexDetalle);
+                    cantidad += detalle.getCantidad();
+                    detalle.setCantidad(cantidad);
+                    flag = true;
+                } else {
+                    flag = lstDetallesVenta.add(new DetalleVenta(data));
+                }
+                calcularPrecios(data);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -48,32 +53,15 @@ public class CtrlDetalleVenta implements Controller<DetalleVenta>{
     public int indexOf(JSONObject data) {
         int i = -1;
         int search = data.getJSONObject("venta").getInt("consecutivo");
-        for(DetalleVenta detalle : lstDetallesVenta){
-            if(detalle.getVenta().getConsecutivo() == search){
+        Enum search2 = data.getJSONObject("celular").getEnum(Tipo.class, "tipo");
+        for (DetalleVenta detalle : lstDetallesVenta) {
+            if (detalle.getVenta().getConsecutivo() == search && detalle.getCelular().getTipo().equals(search2)) {
                 i = lstDetallesVenta.indexOf(detalle);
+                break;
             }
         }
         return i;
     }
-    
-    /*public int indexOf(JSONObject data) throws JSONException, ParseException {
-        int i = -1;
-
-        int consecutivo = data.getJSONObject("venta").getInt("consecutivo");
-        Enum tipoBuscado = data.getJSONObject("celular").getEnum(Tipo.class, "tipo");
-
-        for (DetalleVenta dv : lstDetallesVentas) {
-
-            if (dv.getVenta().getConsecutivo() == consecutivo && dv.getCelular().getTipo().equals(tipoBuscado)) {
-
-                i = lstDetallesVentas.indexOf(dv);
-                break;
-            }
-
-        }
-
-        return i;
-    }*/
 
     @Override
     public int indexOf(String strData) {
@@ -87,7 +75,12 @@ public class CtrlDetalleVenta implements Controller<DetalleVenta>{
 
     @Override
     public DetalleVenta set(int indice, JSONObject data) {
-        return lstDetallesVenta.set(indice, new DetalleVenta(data));
+        try {
+            return lstDetallesVenta.set(indice, new DetalleVenta(data));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
@@ -104,9 +97,26 @@ public class CtrlDetalleVenta implements Controller<DetalleVenta>{
     public int size() {
         return lstDetallesVenta.size();
     }
-    
-    private void calcularPrecios(JSONObject data) {
 
+    private void calcularPrecios(JSONObject data) {
+        int cantidadA;
+        int consecutivo = data.getInt("consecutivo");
+        String jsonTipoA = String.format("{ \"venta\": { \"consecutivo\": 1 }, \"celular\": { \"tipo\": \"A\" } }");
+        int indexA = indexOf(jsonTipoA);
+        
+        if(indexA == -1){
+            cantidadA = 0;
+        } else{
+            cantidadA = lstDetallesVenta.get(indexA).getCantidad();
+        }
+        
+        for(DetalleVenta detalle : lstDetallesVenta){
+            if(detalle.getVenta().getConsecutivo() == consecutivo){
+                Tipo tipo = detalle.getCelular().getTipo();
+                int cantidad = detalle.getCantidad();
+                //detalle = getPrecioCelular(tipo, cantidad, cantidadA);
+            }
+        }
     }
 
     private double getPrecioCelular(Tipo tipo, int cantidad, int cantidadA) {
@@ -140,5 +150,5 @@ public class CtrlDetalleVenta implements Controller<DetalleVenta>{
         }
         return precio;
     }
-    
+
 }

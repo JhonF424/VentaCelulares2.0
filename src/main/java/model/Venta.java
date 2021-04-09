@@ -24,15 +24,15 @@ public class Venta {
     public Venta(JSONObject data) throws ParseException{
         this.consecutivo = data.getInt("consecutivo");
         this.fecha = Helpers.getFecha(data.getString("fecha"));
-        this.cliente = new Cliente(new JSONObject("cliente"));
+        this.cliente = new Cliente(data.getJSONObject("cliente"));
     }
     
-   /* public JSONObject getJSONObject() {
+   public JSONObject getJSONObject() {
         return new JSONObject()
             .put("consecutivo", consecutivo)
             .put("cliente", cliente.getJSONObject())
             .put("fecha", Helpers.strFecha(fecha));
-    } */
+    } 
 
     public Venta(String strData) throws ParseException{
         this(new JSONObject(strData));

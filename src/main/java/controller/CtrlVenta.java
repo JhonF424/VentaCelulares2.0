@@ -28,7 +28,7 @@ public class CtrlVenta implements Controller<Venta> {
                         + " revise el consecutivo en la base de datos.");
                 flag = false;
             } else {
-                lstVentas.add(new Venta(new JSONObject(data)));
+                lstVentas.add(new Venta(data));
                 flag = true;
             }
         } catch (Exception e) {

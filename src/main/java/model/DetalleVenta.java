@@ -15,15 +15,23 @@ public class DetalleVenta {
         this.cantidad = cantidad;
     }
 
-    public DetalleVenta(JSONObject data) {
+    public DetalleVenta(JSONObject data) throws Exception{
         this.venta = new Venta(data.getJSONObject("venta"));
         this.celular = new Celular(data.getJSONObject("celular"));
         this.cantidad = data.getInt("cantidad");
     }
 
-    public DetalleVenta(String strData) {
+    public DetalleVenta(String strData) throws Exception{
         this(new JSONObject(strData));
     }
+    
+       public JSONObject getJSONObject() {
+        return new JSONObject()
+            .put("cantidad", cantidad)
+            .put("precio", precio)
+            .put("venta", venta.getJSONObject())
+            .put("celular", celular.getJSONObject());
+    } 
 
     public int getCantidad() {
         return cantidad;

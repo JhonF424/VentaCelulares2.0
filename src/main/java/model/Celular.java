@@ -7,23 +7,30 @@ public class Celular {
     private int cantidad;
     private Tipo tipo;
 
-    public Celular() {}
+    public Celular() {
+    }
 
     public Celular(Tipo tipo, int cantidad) {
         this.cantidad = cantidad;
         this.tipo = tipo;
     }
-    
-    public Celular(Celular cel){
+
+    public Celular(Celular cel) {
         this(cel.tipo, cel.cantidad);
     }
-    
-    public Celular(JSONObject data){
+
+    public Celular(JSONObject data) {
         this.tipo = data.getEnum(Tipo.class, "tipo");
         this.cantidad = data.getInt("cantidad");
     }
-    
-    public Celular(String strData){
+
+    public JSONObject getJSONObject() {
+        return new JSONObject()
+                .put("cantidad", cantidad)
+                .put("tipo", tipo);
+    }
+
+    public Celular(String strData) {
         this(new JSONObject(strData));
     }
 
@@ -42,17 +49,17 @@ public class Celular {
     public void setTipo(Tipo tipo) {
         this.tipo = tipo;
     }
-    
+
     @Override
     public boolean equals(Object o) {
-        if (o == this) { 
+        if (o == this) {
             return true;
         }
-        
-        if (!(o instanceof Celular)) { 
+
+        if (!(o instanceof Celular)) {
             return false;
         }
-        Celular celular = (Celular) o; 
+        Celular celular = (Celular) o;
         return this.tipo.equals(celular.tipo);
     }
 
@@ -60,7 +67,5 @@ public class Celular {
     public String toString() {
         return "Celular{ " + "cantidad: " + cantidad + ", tipo: " + tipo + " }";
     }
-    
-    
 
 }
