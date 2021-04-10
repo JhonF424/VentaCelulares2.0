@@ -15,23 +15,23 @@ public class DetalleVenta {
         this.cantidad = cantidad;
     }
 
-    public DetalleVenta(JSONObject data) throws Exception{
+    public DetalleVenta(JSONObject data) throws Exception {
         this.venta = new Venta(data.getJSONObject("venta"));
         this.celular = new Celular(data.getJSONObject("celular"));
         this.cantidad = data.getInt("cantidad");
     }
 
-    public DetalleVenta(String strData) throws Exception{
+    public DetalleVenta(String strData) throws Exception {
         this(new JSONObject(strData));
     }
-    
-       public JSONObject getJSONObject() {
+
+    public JSONObject getJSONObject() {
         return new JSONObject()
-            .put("cantidad", cantidad)
-            .put("precio", precio)
-            .put("venta", venta.getJSONObject())
-            .put("celular", celular.getJSONObject());
-    } 
+                .put("cantidad", cantidad)
+                .put("precio", precio)
+                .put("venta", venta.getJSONObject())
+                .put("celular", celular.getJSONObject());
+    }
 
     public int getCantidad() {
         return cantidad;
@@ -66,8 +66,7 @@ public class DetalleVenta {
     }
 
     public double getTotal() {
-        //TODO: Implementar el método para obtener el total
-        return 0;
+        return precio * cantidad;
     }
 
     @Override

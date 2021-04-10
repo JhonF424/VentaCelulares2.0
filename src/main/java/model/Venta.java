@@ -77,7 +77,7 @@ public class Venta {
 
     @Override
     public String toString() {
-        return "Venta{ " + "consecutivo: " + consecutivo + ", fecha: " + fecha + ", cliente: " + cliente +" }";
+        return String.format("Factura N:   %d      Fecha: %s %n Cliente: %s", consecutivo, Helpers.strFecha(fecha), cliente);
     }
     
 }

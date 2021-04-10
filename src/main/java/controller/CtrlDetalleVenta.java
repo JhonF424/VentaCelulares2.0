@@ -100,8 +100,8 @@ public class CtrlDetalleVenta implements Controller<DetalleVenta> {
 
     private void calcularPrecios(JSONObject data) {
         int cantidadA;
-        int consecutivo = data.getInt("consecutivo");
-        String jsonTipoA = String.format("{ \"venta\": { \"consecutivo\": 1 }, \"celular\": { \"tipo\": \"A\" } }");
+        int consecutivo = data.getJSONObject("venta").getInt("consecutivo");
+        String jsonTipoA = String.format("{ \"venta\": { \"consecutivo\": %d }, \"celular\": { \"tipo\": \"A\" } }", consecutivo);
         int indexA = indexOf(jsonTipoA);
         
         if(indexA == -1){
@@ -114,7 +114,7 @@ public class CtrlDetalleVenta implements Controller<DetalleVenta> {
             if(detalle.getVenta().getConsecutivo() == consecutivo){
                 Tipo tipo = detalle.getCelular().getTipo();
                 int cantidad = detalle.getCantidad();
-                //detalle = getPrecioCelular(tipo, cantidad, cantidadA);
+                detalle.setPrecio(getPrecioCelular(tipo, cantidad, cantidadA));
             }
         }
     }

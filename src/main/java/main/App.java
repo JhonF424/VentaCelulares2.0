@@ -62,10 +62,12 @@ public class App {
          */
         iniciarControladores();
         agregarDatosDePrueba();
+        verDatosPrueba();
         /*do {
             int opt = leerOpcion();
             switch (opt) {
                 case 1:
+                    
                     break;
                 case 2:
                     break;
@@ -73,12 +75,128 @@ public class App {
                     break;
                 case 4:
                     break;
+                case 5:
+                    break;
+                case 6:
+                    break;
                 case 99:
                     System.exit(0);
                     break;
             }
         } while (true);*/
+    }
+    
+    private static void verDatosPrueba(){
+        System.out.println("-".repeat(36));
+        System.out.println("ID       NOMBRE      TELÉFONO");
+        System.out.println("-".repeat(36));
+        for(Cliente cliente : ctrlClientes.list()){
+            System.out.printf("", cliente.getNombre());
+        }
+    }
+    
+    /*private static String mayorVenta(){
+        Venta temporal = new Venta();
+        
+        for(Venta venta : ctrlVentas.list()){
+            if(){
+                
+            }
+        }
+    }*/
 
+    private static Tipo masVendido(int a, int b, int c) {
+        Tipo masVendido = Tipo.INDEFINIDO;
+        if (a > b && a > c) {
+            masVendido = Tipo.A;
+        } else if (b > a && b > c) {
+            masVendido = Tipo.B;
+        } else if (c > a && c > b) {
+            masVendido = Tipo.C;
+        }
+
+        return masVendido;
+    }
+
+    private static Tipo intermedio(int a, int b, int c) {
+        Tipo tipoIntermedio = Tipo.INDEFINIDO;
+        
+        if (a > c && a < b) {
+            tipoIntermedio = Tipo.A;
+        } else if (b > c && b < a) {
+            tipoIntermedio = Tipo.B;
+        } else if (c > b && c < a) {
+            tipoIntermedio = Tipo.C;
+        }
+
+        return tipoIntermedio;
+    }
+
+    private static void listarVentas() {
+        double ventaBase = 0;
+        double ventasBaseT = 0;
+        double ivaT = 0;
+        double netoT = 0;
+        double iva;
+        double neto;
+        for (Venta venta : ctrlVentas.list()) {
+            System.out.println("--------------------------------------");
+            System.out.printf("Factura No: %d   Cliente:  %s - %n", venta.getConsecutivo(), venta.getCliente());
+            System.out.println("--------------------------------------");
+            listarVenta(venta, 2);
+            ventaBase = listarVenta(venta, 0);
+            ventasBaseT += ventaBase;
+            iva = ventaBase * 0.19;
+            ivaT += iva;
+            neto = ventaBase + iva;
+            netoT += neto;
+            System.out.println("--------------------------------------");
+            System.out.printf("     Total venta base: %.0f %n", ventaBase);
+            System.out.printf("     Total de IVA:     %.0f %n", iva);
+            System.out.printf("     Total Neto:       %.0f %n", neto);
+            System.out.println("--------------------------------------");
+        }
+        System.out.println("");
+        System.out.println("--------------------------------------");
+        System.out.printf("     Total venta base: %.0f %n", ventasBaseT);
+        System.out.printf("     Total de IVA:     %.0f %n", ivaT);
+        System.out.printf("     Total Neto:       %.0f %n", netoT);
+        System.out.println("--------------------------------------");
+
+    }
+
+    private static double listarVenta(Venta v, int modo) {
+        double valorVenta = 0;
+        switch (modo) {
+
+            case 0:
+                for (DetalleVenta detalle : ctrlDetallesVenta.list()) {
+                    if (detalle.getVenta().getConsecutivo() == v.getConsecutivo()) {
+                        valorVenta += detalle.getTotal();
+                    }
+                }
+                break;
+            case 2:
+                System.out.println("CANT. TIPO Vr.UNIT   Vr.TOTAL");
+                for (DetalleVenta detalle : ctrlDetallesVenta.list()) {
+                    if (detalle.getVenta().getConsecutivo() == v.getConsecutivo()) {
+                        System.out.printf("%d       %s    %.0f    %.0f   %n", detalle.getCantidad(), detalle.getCelular().getTipo(), detalle.getPrecio(), detalle.getTotal());
+                    }
+                }
+                break;
+            case 1:
+                System.out.println("ÍNDICE CANT. TIPO Vr.UNIT   Vr.TOTAL");
+                int count = 0;
+                for (DetalleVenta detalle : ctrlDetallesVenta.list()) {
+                    count++;
+                    if (detalle.getVenta().getConsecutivo() == v.getConsecutivo()) {
+                        System.out.printf("%d       %d       %s    %.0f    %.0f   %n", count, detalle.getCantidad(), detalle.getCelular().getTipo(), detalle.getPrecio(), detalle.getTotal());
+                    }
+                }
+                break;
+        }
+
+        return valorVenta;
     }
 
     public static void agregarCelulares() {
@@ -104,7 +222,7 @@ public class App {
             agregarDetalleVenta(0, 2, 1);
 
         }
-        
+
         if (ctrlVentas.add(new Venta(consecutivo, Calendar.getInstance(), ctrlClientes.get(1)).getJSONObject())) {
             consecutivo++;
             agregarDetalleVenta(1, 0, 2);
@@ -157,8 +275,8 @@ public class App {
 
         try {
             int i = ctrlDetallesVenta.indexOf(
-                       "{ \"venta\": { \"consecutivo\": 1 }, \"celular\": { \"tipo\": \"A\" } }"
-                    );
+                    "{ \"venta\": { \"consecutivo\": 1 }, \"celular\": { \"tipo\": \"A\" } }"
+            );
             System.out.println(i == -1 ? "No encontrado" : "Encontrado");
         } catch (Exception e) {
             e.printStackTrace();
@@ -174,6 +292,12 @@ public class App {
 
     public static int leerOpcion() {
         String menu = "Menú de opciones\n"
+                + "1 - Ver datos de prueba\n"
+                + "2 - Agregar existencias\n"
+                + "3 - Agregar cliente\n"
+                + "4 - Realizar ventas\n"
+                + "5 - Registrar devolución\n"
+                + "6 - Informe\n"
                 + "99. Salir";
 
         System.out.println("-".repeat(100));
