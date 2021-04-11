@@ -72,7 +72,7 @@ public class Cliente {
 
     @Override
     public String toString() {
-        return String.format("%s %s %s", identificacion, nombre, telefono);
+        return String.format("%s - %s %s", identificacion, nombre, telefono);
     }
     
     

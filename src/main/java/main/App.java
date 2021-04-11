@@ -5,7 +5,6 @@ import java.util.*;
 import controller.*;
 import java.text.ParseException;
 import model.*;
-import resources.Helpers;
 
 public class App {
 
@@ -18,92 +17,236 @@ public class App {
     static int consecutivo = 0;
 
     public static void main(String[] args) throws ParseException {
+        
+        
+        
         scan.useDelimiter("[\n]+|[\r\n]+");
 
-        /*
-        --------------------------------------------------------------
-        TESTING
-        --------------------------------------------------------------
-        Cliente a = new Cliente("C01", "Carlos Cuesta", "3138447845");
-        Cliente b = new Cliente("C01", "Ricardo Pérez", "3137771234");
-        Cliente c = a;
-        System.out.println(a.equals(b)); // deber mostrar true
-        System.out.println(a.equals(c)); // deber mostrar true 
-        
-        Celular c1 = new Celular(Tipo.A, 111);
-        Celular c2 = new Celular(Tipo.A, 777);
-        Celular c3 = c2;
-        System.out.println(c1.equals(c2)); // deber mostrar true
-        System.out.println(c1.equals(c3)); // deber mostrar true 
-        
-        Venta v1 = new Venta(1, Calendar.getInstance(), a);
-        Venta v2 = new Venta(1, Helpers.getFecha("1890-01-01"), b);
-        Venta v3 = v1;
-        System.out.println(v1.equals(v2)); // deber mostrar true
-        System.out.println(v1.equals(v3)); // deber mostrar true 
-        
-        DetalleVenta dv1 = new DetalleVenta(v1, c1, 44);
-        DetalleVenta dv2 = new DetalleVenta(v1, c1, 66);
-        DetalleVenta dv3 = dv1;
-        System.out.println(dv1.equals(dv2)); // deber mostrar true
-        System.out.println(dv1.equals(dv3)); // deber mostrar true 
-        
-        ctrlCelulares.add(new JSONObject(new Celular(Tipo.A, 111)));
-        ctrlClientes.add(new JSONObject(new Cliente("C01", "Carlos Cuesta", "3138447845")));
-        ctrlVentas.add(new Venta(1, Calendar.getInstance(),ctrlClientes.get(0)).getJSONObject);
-        
-        System.out.println(ctrlDetallesVenta.getPrecioCelular(Tipo.A, 3, 99999)); //  150000
-        System.out.println(ctrlDetallesVenta.getPrecioCelular(Tipo.A, 5, 99999)); //  120000
-        System.out.println(ctrlDetallesVenta.getPrecioCelular(Tipo.B, 5, 99999)); //  400000
-        System.out.println(ctrlDetallesVenta.getPrecioCelular(Tipo.B, 8, 99999)); //  300000
-        System.out.println(ctrlDetallesVenta.getPrecioCelular(Tipo.C, 1, 1));     // 1200000
-        System.out.println(ctrlDetallesVenta.getPrecioCelular(Tipo.C, 2, 1));     // 1000000
-        --------------------------------------------------------------
-         */
         iniciarControladores();
         agregarDatosDePrueba();
-        verDatosPrueba();
-        /*do {
+
+        do {
             int opt = leerOpcion();
             switch (opt) {
                 case 1:
-                    
+                    verDatosPrueba();
                     break;
                 case 2:
+                    agregarExistencias();
                     break;
                 case 3:
+                    agregarCliente();
                     break;
                 case 4:
+                    realizarVenta();
                     break;
                 case 5:
+                    agregarDevoluciones();
                     break;
                 case 6:
+                    estadisticas();
                     break;
                 case 99:
                     System.exit(0);
                     break;
             }
-        } while (true);*/
+        } while (true);
     }
-    
-    private static void verDatosPrueba(){
-        System.out.println("-".repeat(36));
-        System.out.println("ID       NOMBRE      TELÉFONO");
-        System.out.println("-".repeat(36));
-        for(Cliente cliente : ctrlClientes.list()){
-            System.out.printf("", cliente.getNombre());
-        }
-    }
-    
-    /*private static String mayorVenta(){
-        Venta temporal = new Venta();
-        
-        for(Venta venta : ctrlVentas.list()){
-            if(){
-                
+
+    private static void estadisticas() {
+        System.out.println("Estadísticas: \n");
+        int countA = 0, countB = 0, countC = 0;
+        for (DetalleVenta detalle : ctrlDetallesVenta.list()) {
+
+            if (detalle.getCelular().getTipo() == Tipo.A) {
+                countA++;
+            } else if (detalle.getCelular().getTipo() == Tipo.B) {
+                countB++;
+            } else if (detalle.getCelular().getTipo() == Tipo.C) {
+                countC++;
             }
         }
-    }*/
+
+        System.out.println("Celulares vendidos del tipo A: " + countA);
+        System.out.println("Celulares vendidos del tipo B: " + countB);
+        System.out.println("Celulares vendidos del tipo C: " + countC);
+        System.out.println("");
+        System.out.println("El tipo de celular más vendido fue el: " + masVendido(countA, countB, countC));
+        System.out.println("El tipo que no fue el más vendido, pero tampoco el menos vendido fue el: " + intermedio(countA, countB, countC));
+        System.out.println("");
+        double costoA = -150000;
+        double costoB = -400000;
+        double costoC = -1200000;
+        for (DetalleVenta detalle : ctrlDetallesVenta.list()) {
+            if(detalle.getCelular().getTipo().equals(Tipo.A)){
+                costoA += detalle.getTotal();
+            }
+            if(detalle.getCelular().getTipo().equals(Tipo.B)){
+                costoB += detalle.getTotal();
+            }
+            if(detalle.getCelular().getTipo().equals(Tipo.C)){
+                costoC += detalle.getTotal();
+            }
+        }
+        System.out.println("Total venta de celulares de tipo A: " + costoA);
+        System.out.println("Total venta de celulares de tipo B: " + costoB);
+        System.out.println("Total venta de celulares de tipo C: " + costoC);
+        System.out.println("");
+        System.out.println(mayorVenta());
+    }
+
+
+    private static void realizarVenta() {
+        int count = 0;
+        data.put("consecutivo", ctrlVentas.size() + 1);
+        data.put("fecha", Calendar.getInstance());
+        System.out.println("Clientes: ");
+        for (Object cliente : ctrlClientes.list()) {
+            count++;
+            System.out.printf("%d - %s %n", count, cliente);
+        }
+        System.out.println("Seleccione el índice del cliente al que le hará la venta: ");
+        int indiceCliente = scan.nextInt();
+        data.put("cliente", new JSONObject(ctrlClientes.get(indiceCliente)));
+        ctrlVentas.add(data);
+        boolean salida = false;
+        int cantidad = 0;
+        int indiceCelular = 0;
+        do {
+            System.out.println("Tipo de celular: (A | B | C)");
+            String tipo = scan.next().toUpperCase();
+            switch (tipo) {
+                case "A":
+                    indiceCelular = 0;
+                    System.out.println("Ingrese la cantidad a comprar: ");
+                    cantidad = scan.nextInt();
+                    break;
+                case "B":
+                    indiceCelular = 1;
+                    System.out.println("Ingrese la cantidad a comprar: ");
+                    cantidad = scan.nextInt();
+                    break;
+                case "C":
+                    indiceCelular = 2;
+                    System.out.println("Ingrese la cantidad a comprar: ");
+                    cantidad = scan.nextInt();
+                    break;
+                default:
+                    salida = false;
+            }
+        } while (salida == true);
+
+        agregarDetalleVenta(ctrlVentas.size() -1, indiceCelular, cantidad);
+        
+    }
+
+    private static void agregarDevoluciones() {
+        double totalBase = 0;
+        double totalIVA = 0;
+        double totalNeto = 0;
+        int count = 0;
+        System.out.println("Devolución");
+        for (Venta venta : ctrlVentas.list()) {
+            count++;
+            System.out.printf("%d %d %s %s", count, venta.getConsecutivo(), venta.getFecha(), venta.getCliente());
+        }
+        System.out.print("Seleccione el índice de la venta: ");
+        int indiceVenta = scan.nextInt();
+
+        for (int i = 0; i < ctrlVentas.size(); i++) {
+            if (ctrlVentas.get(i).equals(ctrlVentas.get(indiceVenta))) {
+                System.out.println("-".repeat(34));
+                System.out.println(ctrlVentas.get(i));
+                System.out.println("-".repeat(34));
+                System.out.println("INDICE CANT. TIPO Vr. UNIT. Vr. TOTAL");
+                System.out.println("-".repeat(34));
+                listarVenta(ctrlVentas.get(i), 1);
+                totalBase = listarVenta(ctrlVentas.get(i), 0);
+                totalIVA = totalBase * 0.19;
+                totalNeto = totalBase * 1.19;
+                System.out.println("-".repeat(34));
+                System.out.printf("Total base venta: %s", totalBase);
+                System.out.printf("%nTotal IVA: %s", totalIVA);
+                System.out.printf("%nTotal neto %s %n", totalNeto);
+                System.out.println("-".repeat(34));
+                System.out.println();
+                System.out.print("Indice del detalle afectado con la devolución: ");
+                int indiceDetalle = scan.nextInt();
+                System.out.printf("Cuántos celulares devuelve (Hasta %d): ",
+                        ctrlDetallesVenta.get(indiceDetalle).getCantidad());
+                int cantidad = scan.nextInt();
+                if (cantidad <= ctrlDetallesVenta.get(indiceDetalle).getCantidad()) {
+                    ctrlDetallesVenta.get(indiceDetalle)
+                            .setCantidad(ctrlDetallesVenta.get(indiceDetalle).getCantidad() - cantidad);
+                } else {
+                    System.out.println("Error en la cantidad de celulares.");
+                }
+            }
+        }
+    }
+
+    private static void agregarCliente() {
+        System.out.println("ID del cliente: ");
+        data.put("identificacion", scan.next());
+        System.out.println("Nombre del cliente: ");
+        data.put("nombre", scan.next());
+        System.out.println("Teléfono del cliente: ");
+        data.put("telefono", scan.next());
+        ctrlClientes.add((data));
+    }
+
+    private static void agregarExistencias() {
+        System.out.println("Tipo de celular: (A | B | C)");
+        data.put("tipo", scan.next().toUpperCase());
+        int indice = ctrlCelulares.indexOf(data);
+        Celular celular = ctrlCelulares.get(indice);
+        System.out.println("Cantidad de celulares: ");
+        int cantidad = scan.nextInt();
+        celular.setCantidad(celular.getCantidad() + cantidad);
+        ctrlCelulares.set(indice, celular.getJSONObject());
+    }
+
+    private static void verDatosPrueba() {
+        System.out.println("-".repeat(30));
+        System.out.println("ID       NOMBRE      TELÉFONO");
+        System.out.println("-".repeat(30));
+        for (Object cliente : ctrlClientes.list()) {
+            System.out.printf("%s %n", cliente);
+        }
+        System.out.println("");
+
+        System.out.println("-".repeat(18));
+        System.out.println("TIPO     CANTIDAD");
+        System.out.println("-".repeat(18));
+        for (Celular celular : ctrlCelulares.list()) {
+            System.out.printf(" %s           %s %n", celular.getTipo(), celular.getCantidad());
+        }
+        System.out.println("-".repeat(18));
+
+        System.out.println("");
+
+        for (Venta venta : ctrlVentas.list()) {
+            listarVenta(ctrlVentas.get(0), 2);
+            break;
+        }
+    }
+
+    private static String mayorVenta() {
+        double temporal = 0;
+        double mayor = 0;
+        int contVenta = 0;
+        int consecMayor = 0;
+        for (Venta venta : ctrlVentas.list()) {
+            contVenta++;
+            temporal = listarVenta(venta, 0);
+            if (temporal > mayor) {
+                mayor = temporal;
+                consecMayor = contVenta;
+            }
+        }
+        return "La factura " + consecMayor + "es la de mayor valor hasta ahora con un total"
+                + "de " + mayor;
+    }
 
     private static Tipo masVendido(int a, int b, int c) {
         Tipo masVendido = Tipo.INDEFINIDO;
@@ -113,6 +256,8 @@ public class App {
             masVendido = Tipo.B;
         } else if (c > a && c > b) {
             masVendido = Tipo.C;
+        } else {
+            System.out.println("debug");
         }
 
         return masVendido;
@@ -120,7 +265,7 @@ public class App {
 
     private static Tipo intermedio(int a, int b, int c) {
         Tipo tipoIntermedio = Tipo.INDEFINIDO;
-        
+
         if (a > c && a < b) {
             tipoIntermedio = Tipo.A;
         } else if (b > c && b < a) {
@@ -141,7 +286,7 @@ public class App {
         double neto;
         for (Venta venta : ctrlVentas.list()) {
             System.out.println("--------------------------------------");
-            System.out.printf("Factura No: %d   Cliente:  %s - %n", venta.getConsecutivo(), venta.getCliente());
+            System.out.printf("Factura No: %d Fecha: %s %nCliente:  %s - %s %n", venta.getConsecutivo(), venta.getFecha(), venta.getCliente().getIdentificacion(), venta.getCliente().getNombre());
             System.out.println("--------------------------------------");
             listarVenta(venta, 2);
             ventaBase = listarVenta(venta, 0);
@@ -167,6 +312,8 @@ public class App {
 
     private static double listarVenta(Venta v, int modo) {
         double valorVenta = 0;
+        double iva = 0;
+        double neto = 0;
         switch (modo) {
 
             case 0:
@@ -181,8 +328,16 @@ public class App {
                 for (DetalleVenta detalle : ctrlDetallesVenta.list()) {
                     if (detalle.getVenta().getConsecutivo() == v.getConsecutivo()) {
                         System.out.printf("%d       %s    %.0f    %.0f   %n", detalle.getCantidad(), detalle.getCelular().getTipo(), detalle.getPrecio(), detalle.getTotal());
+                        valorVenta += detalle.getTotal();
+                        iva = valorVenta * 0.19;
+                        neto = valorVenta + iva;
                     }
                 }
+                System.out.println("--------------------------------------");
+                System.out.printf("     Total venta base: %.0f %n", valorVenta);
+                System.out.printf("     Total de IVA:     %.0f %n", iva);
+                System.out.printf("     Total Neto:       %.0f %n", neto);
+                System.out.println("--------------------------------------");
                 break;
             case 1:
                 System.out.println("ÍNDICE CANT. TIPO Vr.UNIT   Vr.TOTAL");
@@ -191,8 +346,16 @@ public class App {
                     count++;
                     if (detalle.getVenta().getConsecutivo() == v.getConsecutivo()) {
                         System.out.printf("%d       %d       %s    %.0f    %.0f   %n", count, detalle.getCantidad(), detalle.getCelular().getTipo(), detalle.getPrecio(), detalle.getTotal());
+                        valorVenta += detalle.getTotal();
+                        iva = valorVenta * 0.19;
+                        neto = valorVenta + iva;
                     }
                 }
+                System.out.println("--------------------------------------");
+                System.out.printf("     Total venta base: %.0f %n", valorVenta);
+                System.out.printf("     Total de IVA:     %.0f %n", iva);
+                System.out.printf("     Total Neto:       %.0f %n", neto);
+                System.out.println("--------------------------------------");
                 break;
         }
 
